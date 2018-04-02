@@ -44,12 +44,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             try {
                 addressList = geocoder.getFromLocationName(location, 1);
 
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
             Address address = addressList.get(0);
+            System.out.println(address);
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+            mMap.addMarker(new MarkerOptions().position(latLng).title(address.getFeatureName()));
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         }
 
