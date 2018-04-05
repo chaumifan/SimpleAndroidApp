@@ -24,6 +24,8 @@ import java.util.List;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private String[] history;
+    private int index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,12 +35,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        history = new String[10];
+        index = 0;
     }
 
     public void onMapSearch(View view) {
         System.out.println("on map search called");
         EditText locationSearch = (EditText) findViewById(R.id.editText);
         String location = locationSearch.getText().toString();
+        history[index] = location;
+        index++;
         List<Address> addressList = null;
 
         if (location != null || !location.equals("")) {
@@ -58,6 +64,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         }
         hideKeyboard(view);
+    }
+    public void displayHistory(View view) {
+        for (int i = 0; i < index; i++) {
+            
+        }
+    }
+
+    public void displayPopular(View view) {
+
     }
 
     public void hideKeyboard(View view) {
