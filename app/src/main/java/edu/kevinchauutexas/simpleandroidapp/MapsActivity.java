@@ -3,15 +3,22 @@ package edu.kevinchauutexas.simpleandroidapp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -20,7 +27,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -31,6 +37,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Queue<String> history;
     private int curSize;
     private final int MAXHISTORYSIZE = 10;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
+    private Location mLastLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
         history = new LinkedList<>();
         curSize = 0;
+        configureButton();
     }
 
     public void onMapSearch(View view) {
@@ -69,9 +78,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             mMap.clear();
             Address address = addressList.get(0);
-            for(String s : history) {
-                System.out.println(s);
-            }
+
             System.out.println(address);
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
             mMap.addMarker(new MarkerOptions().position(latLng).title(address.getFeatureName()));
@@ -90,7 +97,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void displayPopular(View view) {
-
+        Intent intent = new Intent(this, PopularActivity.class);
+        startActivity(intent);
     }
 
     public void hideKeyboard(View view) {
@@ -123,5 +131,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
         return true;
+    }
+
+    private void configureButton() {
+        Button myLocation = (Button) findViewById(R.id.mylocation_button);
+        final EditText ed = (EditText) findViewById(R.id.editText);
+
+        myLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ed.setText("Austin");
+            }
+        });
     }
 }
