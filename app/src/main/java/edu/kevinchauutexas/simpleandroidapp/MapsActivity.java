@@ -2,6 +2,7 @@ package edu.kevinchauutexas.simpleandroidapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.support.v4.app.FragmentActivity;
@@ -19,13 +20,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private String[] history;
-    private int index;
+    private Queue<String> history;
+    private int curSize;
+    private final int MAXHISTORYSIZE = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,16 +40,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        history = new String[10];
-        index = 0;
+        history = new LinkedList<>();
+        curSize = 0;
     }
 
     public void onMapSearch(View view) {
         System.out.println("on map search called");
         EditText locationSearch = (EditText) findViewById(R.id.editText);
         String location = locationSearch.getText().toString();
-        history[index] = location;
-        index++;
+
+        if (curSize == MAXHISTORYSIZE)
+            history.remove();
+        else
+            curSize++;
+
+        history.add(location);
+
         List<Address> addressList = null;
 
         if (location != null || !location.equals("")) {
@@ -58,6 +69,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
             mMap.clear();
             Address address = addressList.get(0);
+            for(String s : history) {
+                System.out.println(s);
+            }
             System.out.println(address);
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
             mMap.addMarker(new MarkerOptions().position(latLng).title(address.getFeatureName()));
@@ -66,9 +80,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         hideKeyboard(view);
     }
     public void displayHistory(View view) {
-        for (int i = 0; i < index; i++) {
-            
+        String historyStr = "";
+        for(String s : history) {
+            historyStr = s + "\n" + historyStr;
         }
+        Intent intent = new Intent(this, HistoryActivity.class);
+        intent.putExtra("history", historyStr);
+        startActivity(intent);
     }
 
     public void displayPopular(View view) {
